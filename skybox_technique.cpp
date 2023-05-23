@@ -1,42 +1,50 @@
-#include "shadow_map_technique.h"
+#include <limits.h>
+#include <string.h>
+
+#include "skybox_technique.h"
+#include "util.h"
 
 static const char* pVS = "                                                          \n\
 #version 330                                                                        \n\
                                                                                     \n\
 layout (location = 0) in vec3 Position;                                             \n\
-layout (location = 1) in vec2 TexCoord;                                             \n\
-layout (location = 2) in vec3 Normal;                                               \n\
                                                                                     \n\
 uniform mat4 gWVP;                                                                  \n\
                                                                                     \n\
-out vec2 TexCoordOut;                                                               \n\
+out vec3 TexCoord0;                                                                 \n\
                                                                                     \n\
 void main()                                                                         \n\
 {                                                                                   \n\
-    gl_Position = gWVP * vec4(Position, 1.0);                                       \n\
-    TexCoordOut = TexCoord;                                                         \n\
+    vec4 WVP_Pos = gWVP * vec4(Position, 1.0);                                      \n\
+    gl_Position = WVP_Pos.xyww;                                                     \n\
+    TexCoord0   = Position;                                                         \n\
 }";
 
 static const char* pFS = "                                                          \n\
 #version 330                                                                        \n\
                                                                                     \n\
-in vec2 TexCoordOut;                                                                \n\
-uniform sampler2D gShadowMap;                                                       \n\
+in vec3 TexCoord0;                                                                  \n\
                                                                                     \n\
 out vec4 FragColor;                                                                 \n\
                                                                                     \n\
+uniform samplerCube gCubemapTexture;                                                \n\
+                                                                                    \n\
 void main()                                                                         \n\
 {                                                                                   \n\
-    float Depth = texture(gShadowMap, TexCoordOut).x;                               \n\
-    Depth = 1.0 - (1.0 - Depth) * 25.0;                                             \n\
-    FragColor = vec4(Depth);                                                        \n\
+    FragColor = texture(gCubemapTexture, TexCoord0);                                \n\
 }";
 
-ShadowMapTechnique::ShadowMapTechnique()
+
+
+SkyboxTechnique::SkyboxTechnique()
 {
 }
 
-bool ShadowMapTechnique::Init()
+SkyboxTechnique::~SkyboxTechnique()
+{
+}
+
+bool SkyboxTechnique::Init()
 {
     if (!Technique::Init()) {
         return false;
@@ -55,7 +63,7 @@ bool ShadowMapTechnique::Init()
     }
 
     m_WVPLocation = GetUniformLocation("gWVP");
-    m_textureLocation = GetUniformLocation("gShadowMap");
+    m_textureLocation = GetUniformLocation("gCubemapTexture");
 
     if (m_WVPLocation == INVALID_UNIFORM_LOCATION ||
         m_textureLocation == INVALID_UNIFORM_LOCATION) {
@@ -65,12 +73,15 @@ bool ShadowMapTechnique::Init()
     return true;
 }
 
-void ShadowMapTechnique::SetWVP(const Matrix4f& WVP)
+
+void SkyboxTechnique::SetWVP(const Matrix4f& WVP)
 {
     glUniformMatrix4fv(m_WVPLocation, 1, GL_TRUE, (const GLfloat*)WVP.m);
 }
 
-void ShadowMapTechnique::SetTextureUnit(unsigned int TextureUnit)
+
+void SkyboxTechnique::SetTextureUnit(unsigned int TextureUnit)
 {
     glUniform1i(m_textureLocation, TextureUnit);
 }
+

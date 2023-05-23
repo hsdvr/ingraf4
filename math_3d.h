@@ -114,6 +114,14 @@ inline Vector3f operator*(const Vector3f& l, float f)
     return Ret;
 }
 
+struct PersProjInfo
+{
+    float FOV;
+    float Width;
+    float Height;
+    float zNear;
+    float zFar;
+};
 
 class Matrix4f
 {
@@ -149,11 +157,18 @@ public:
         return Ret;
     }
 
+    void Print()
+    {
+        for (int i = 0; i < 4; i++) {
+            printf("%f %f %f %f\n", m[i][0], m[i][1], m[i][2], m[i][3]);
+        }
+    }
+
     void InitScaleTransform(float ScaleX, float ScaleY, float ScaleZ);
     void InitRotateTransform(float RotateX, float RotateY, float RotateZ);
     void InitTranslationTransform(float x, float y, float z);
     void InitCameraTransform(const Vector3f& Target, const Vector3f& Up);
-    void InitPersProjTransform(float FOV, float Width, float Height, float zNear, float zFar);
+    void InitPersProjTransform(const PersProjInfo& p);
 };
 
 

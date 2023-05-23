@@ -1,16 +1,21 @@
-#ifndef SHADOW_MAP_TECHNIQUE_H
-#define	SHADOW_MAP_TECHNIQUE_H
+#ifndef SKYBOX_TECHNIQUE_H
+#define	SKYBOX_TECHNIQUE_H
 
 #include "technique.h"
 #include "math_3d.h"
 
-class ShadowMapTechnique : public Technique {
 
+class SkyboxTechnique : public Technique {
 public:
-    ShadowMapTechnique();
+
+    SkyboxTechnique();
+
     virtual bool Init();
+
     void SetWVP(const Matrix4f& WVP);
     void SetTextureUnit(unsigned int TextureUnit);
+
+    virtual ~SkyboxTechnique();
 
 private:
 
@@ -18,4 +23,5 @@ private:
     GLuint m_textureLocation;
 };
 
-#endif	/* SHADOW_MAP_TECHNIQUE_H */
+
+#endif	/* SKYBOX_TECHNIQUE_H */
